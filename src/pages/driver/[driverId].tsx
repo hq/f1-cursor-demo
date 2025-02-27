@@ -7,7 +7,7 @@ import {
   getTeamRadioForDriver,
   getDrivers
 } from '~/lib/api';
-import { Driver, LapData, PitStop, TeamRadio } from '~/types/f1';
+import type { Driver, LapData, PitStop, TeamRadio } from '~/types/f1';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Button } from '~/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
@@ -73,7 +73,7 @@ export default function DriverDetail() {
       }
     };
     
-    fetchDriverData();
+    void fetchDriverData();
   }, [driverId]);
   
   // Prepare data for speed graphs
@@ -133,7 +133,7 @@ export default function DriverDetail() {
       <Layout title="Driver Not Found">
         <div className="container mx-auto">
           <div className="rounded-lg bg-red-100 p-4 text-red-800">
-            {error || 'Driver not found'}
+            {error ?? 'Driver not found'}
           </div>
           <Link href="/">
             <Button variant="outline" className="mt-4">
@@ -160,7 +160,7 @@ export default function DriverDetail() {
           </Link>
           
           {/* Driver Header */}
-          <div className="rounded-lg bg-white p-6 shadow-sm" style={{ borderLeft: `6px solid ${driver.team_color || '#333'}` }}>
+          <div className="rounded-lg bg-white p-6 shadow-sm" style={{ borderLeft: `6px solid ${driver.team_color ?? '#333'}` }}>
             <div className="flex flex-col items-start md:flex-row md:items-center">
               <Avatar className="mb-4 h-24 w-24 md:mb-0 md:mr-6">
                 <AvatarImage src={driver.headshot_url} alt={`${driver.first_name} ${driver.last_name}`} />

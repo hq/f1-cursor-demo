@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getDrivers } from "~/lib/api";
-import { Driver } from "~/types/f1";
+import type { Driver } from "~/types/f1";
 import { DriverCard } from "~/components/DriverCard";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Layout } from "~/components/layout/Layout";
@@ -34,7 +34,7 @@ export default function Home() {
       }
     };
 
-    fetchDrivers();
+    void fetchDrivers();
   }, []);
 
   // Function to render driver card skeletons while loading

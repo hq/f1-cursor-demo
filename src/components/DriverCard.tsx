@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import Link from 'next/link';
-import { Driver } from '~/types/f1';
+import type { Driver } from '~/types/f1';
 import { 
   Card, 
   CardContent, 

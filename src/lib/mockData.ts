@@ -1,4 +1,4 @@
-import { Driver, LapData, PitStop, TeamRadio } from '~/types/f1';
+import type { Driver, LapData, PitStop, TeamRadio } from '~/types/f1';
 
 /**
  * Mock driver data for when the API is unavailable
@@ -208,7 +208,7 @@ export const generateMockTeamRadio = (driverNumber: number): TeamRadio[] => {
     teamRadio.push({
       driver_number: driverNumber,
       audio_url: "https://example.com/audio/placeholder.mp3", // Placeholder URL for audio
-      message: possibleMessages[messageIndex] as string,
+      message: possibleMessages[messageIndex]!,
       session_key: 9001,
       timestamp
     });

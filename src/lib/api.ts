@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Driver, LapData, PitStop, TeamRadio } from '~/types/f1';
+import type { Driver, LapData, PitStop, TeamRadio } from '~/types/f1';
 import { mockDrivers, generateMockLapData, generateMockPitStops, generateMockTeamRadio } from './mockData';
 
 const BASE_URL = 'https://api.openf1.org/v1';
@@ -10,6 +10,17 @@ const config = {
   mockDataOnFailure: true // Use mock data as fallback when API fails
 };
 
+interface SessionResponse {
+  session_key: number;
+  [key: string]: unknown;
+}
+
+interface ChampionshipResponse {
+  driver_number: number;
+  position: number;
+  [key: string]: unknown;
+}
+
 // Get session keys for the 2024 season
 export const get2024SessionKeys = async (): Promise<number[]> => {
   try {
@@ -17,8 +28,8 @@ export const get2024SessionKeys = async (): Promise<number[]> => {
       return [9001]; // Mock session key
     }
     
-    const response = await axios.get(`${BASE_URL}/sessions?year=2024`);
-    return response.data.map((session: any) => session.session_key);
+    const response = await axios.get<SessionResponse[]>(`${BASE_URL}/sessions?year=2024`);
+    return response.data.map((session) => session.session_key);
   } catch (error) {
     console.error('Failed to fetch 2024 session keys:', error);
     if (config.mockDataOnFailure) {
@@ -43,7 +54,7 @@ export const getDrivers = async (): Promise<Driver[]> => {
     }
 
     const requests = sessionKeys.map(sessionKey => 
-      axios.get(`${BASE_URL}/drivers?session_key=${sessionKey}`)
+      axios.get<Driver[]>(`${BASE_URL}/drivers?session_key=${sessionKey}`)
     );
 
     const responses = await Promise.all(requests);
@@ -84,8 +95,8 @@ export const getDrivers = async (): Promise<Driver[]> => {
 export const getDriverChampionshipStandings = async (): Promise<{ driver_number: number; position: number }[]> => {
   try {
     // This endpoint is hypothetical and may need to be adjusted based on actual API availability
-    const response = await axios.get(`${BASE_URL}/championship/drivers?year=2024`);
-    return response.data.map((item: any) => ({
+    const response = await axios.get<ChampionshipResponse[]>(`${BASE_URL}/championship/drivers?year=2024`);
+    return response.data.map((item) => ({
       driver_number: item.driver_number,
       position: item.position
     }));
@@ -94,7 +105,7 @@ export const getDriverChampionshipStandings = async (): Promise<{ driver_number:
     // Return mock championship data
     return mockDrivers.map(driver => ({
       driver_number: driver.driver_number,
-      position: driver.championship_position || 0
+      position: driver.championship_position ?? 0
     }));
   }
 };
@@ -113,7 +124,7 @@ export const getFastestLapForDriver = async (driverNumber: number): Promise<numb
     }
 
     const requests = sessionKeys.map(sessionKey => 
-      axios.get(`${BASE_URL}/laps?driver_number=${driverNumber}&session_key=${sessionKey}`)
+      axios.get<LapData[]>(`${BASE_URL}/laps?driver_number=${driverNumber}&session_key=${sessionKey}`)
     );
 
     const responses = await Promise.all(requests);
@@ -148,11 +159,11 @@ export const getLapDataForDriver = async (driverNumber: number): Promise<LapData
     }
 
     const requests = sessionKeys.map(sessionKey => 
-      axios.get(`${BASE_URL}/laps?driver_number=${driverNumber}&session_key=${sessionKey}`)
+      axios.get<LapData[]>(`${BASE_URL}/laps?driver_number=${driverNumber}&session_key=${sessionKey}`)
     );
 
     const responses = await Promise.all(requests);
-    const lapData = responses.flatMap(response => response.data);
+    const lapData: LapData[] = responses.flatMap(response => response.data);
     
     if (lapData.length === 0) {
       throw new Error('No lap data available');
@@ -181,11 +192,11 @@ export const getPitStopsForDriver = async (driverNumber: number): Promise<PitSto
     }
 
     const requests = sessionKeys.map(sessionKey => 
-      axios.get(`${BASE_URL}/pit?driver_number=${driverNumber}&session_key=${sessionKey}`)
+      axios.get<PitStop[]>(`${BASE_URL}/pit?driver_number=${driverNumber}&session_key=${sessionKey}`)
     );
 
     const responses = await Promise.all(requests);
-    const pitStops = responses.flatMap(response => response.data);
+    const pitStops: PitStop[] = responses.flatMap(response => response.data);
     
     if (pitStops.length === 0) {
       throw new Error('No pit stop data available');
@@ -214,11 +225,11 @@ export const getTeamRadioForDriver = async (driverNumber: number): Promise<TeamR
     }
 
     const requests = sessionKeys.map(sessionKey => 
-      axios.get(`${BASE_URL}/team_radio?driver_number=${driverNumber}&session_key=${sessionKey}`)
+      axios.get<TeamRadio[]>(`${BASE_URL}/team_radio?driver_number=${driverNumber}&session_key=${sessionKey}`)
     );
 
     const responses = await Promise.all(requests);
-    const teamRadio = responses.flatMap(response => response.data);
+    const teamRadio: TeamRadio[] = responses.flatMap(response => response.data);
     
     if (teamRadio.length === 0) {
       throw new Error('No team radio data available');
